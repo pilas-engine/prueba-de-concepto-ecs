@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "amd",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "outFile": "vendor/pilas-engine.js"
+    },
+    "exclude": [
+        "node_modules",
+        "bower_components",
+        "app",
+        "dist",
+        "public",
+        "tmp"
+    ],
+    "filesGlob": [
+        "pilas-engine/**/*.ts"
+    ],
+    "files": [
+        "pilas-engine/declaraciones/box2d.d.ts",
+        "pilas-engine/declaraciones/p2.d.ts",
+        "pilas-engine/declaraciones/phaser.d.ts",
+        "pilas-engine/declaraciones/pixi.d.ts",
+        "pilas-engine/entidades.ts",
+        "pilas-engine/pilas.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
+}

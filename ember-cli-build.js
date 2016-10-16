@@ -7,6 +7,9 @@ module.exports = function(defaults) {
     // Add options here
   });
 
+  app.import('bower_components/phaser/build/phaser.min.js');
+	app.import('vendor/pilas-engine.js');
+
   // Use `app.import` to add additional libraries to the generated
   // output files.
   //
