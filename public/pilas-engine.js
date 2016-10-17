@@ -21,13 +21,14 @@ var Pilas = (function () {
         var alto = 300;
         var opciones = this.obtenerOpciones();
         this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
+        this.cuandoCarga = new Phaser.Signal();
+        this.cuandoActualiza = new Phaser.Signal();
         this.entidades = new Entidades();
     }
     Pilas.prototype.preload = function () {
-        this.cuandoCarga = new Phaser.Signal();
-        this.cuandoActualiza = new Phaser.Signal();
         this.game.stage.disableVisibilityChange = true;
         this.game.load.image('ember', 'imagenes/ember.png');
+        this.cuandoCarga.dispatch();
     };
     Pilas.prototype.obtenerOpciones = function () {
         var _this = this;

@@ -6,7 +6,7 @@
         "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "outFile": "vendor/pilas-engine.js"
+        "outFile": "public/pilas-engine.js"
     },
     "exclude": [
         "node_modules",

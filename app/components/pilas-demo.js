@@ -1,17 +1,17 @@
 import Ember from 'ember';
 
 
-function log() {
-  let nombre = 'log';
+function Log() {
+  //let nombre = 'log';
 
-  this.actualizar = function(entidades) {
-  }
+  this.actualizar = function(/*entidades*/) {
+  };
 
-};
+}
 
 
-function mover() {
-  let nombre =  'mover';
+function Mover() {
+  //let nombre =  'mover';
   let contador = 0;
 
   this.actualizar = function(entidades) {
@@ -20,12 +20,12 @@ function mover() {
     entidades.map((entidad) => {
       entidad.habilidades.posicion.x = Math.sin(contador) * 5;
     });
-  }
-};
+  };
+}
 
 
-function apariencia(game) {
-  let nombre = 'apariencia';
+function Apariencia(game) {
+  //let nombre = 'apariencia';
   let cache = {};
 
   this.actualizar = function(entidades) {
@@ -49,8 +49,8 @@ function apariencia(game) {
       }
       entidad.habilidades.posicion.x += 1;
     });
-  }
-};
+  };
+}
 
 
 export default Ember.Component.extend({
@@ -69,29 +69,32 @@ export default Ember.Component.extend({
 
     let pilas = pilasengine.iniciar(idCanvas);
 
-    pilas.cuandoInicia.add(() => {
-      cuandoInicia();
+    console.log(pilas);
+
+    pilas.cuandoCarga.add(() => {
+      this.cuandoCarga();
+    });
+
+    pilas.cuandoActualiza.add(() => {
+      this.cuandoActualiza();
     });
 
     this.set('pilas', pilas);
   },
 
-  cuandoInicia() {
-    console.log("Ha iniciado pilas!");
-
-    let entidad = this.get('pilas').crearEntidad('MiActor');
+  cuandoCarga() {
+    this.get('pilas').crearEntidad('MiActor');
   },
 
   cuandoActualiza() {
-    console.log("Actualiza");
   },
 
   create() {
     let game = this.get('game');
 
-    this.habilidades.push(new log());
-    this.habilidades.push(new mover());
-    this.habilidades.push(new apariencia(game));
+    this.habilidades.push(new Log());
+    this.habilidades.push(new Mover());
+    this.habilidades.push(new Apariencia(game));
 
     window['entidades'] = this.entidades;
   },
