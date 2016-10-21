@@ -24,6 +24,7 @@
         "pilas-engine/declaraciones/p2.d.ts",
         "pilas-engine/declaraciones/phaser.d.ts",
         "pilas-engine/declaraciones/pixi.d.ts",
+        "pilas-engine/componentes.ts",
         "pilas-engine/entidades.ts",
         "pilas-engine/pilas.ts"
     ],

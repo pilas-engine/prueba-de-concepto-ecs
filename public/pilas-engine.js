@@ -3,6 +3,19 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Componentes = (function () {
+    function Componentes(pilas) {
+        this.pilas = pilas;
+    }
+    Componentes.prototype.etiquetable = function () {
+        var nombre = 'etiquetable';
+        var datos = {
+            etiquetas: ['actor']
+        };
+        return { nombre: nombre, datos: datos };
+    };
+    return Componentes;
+}());
 var Entidades = (function () {
     function Entidades() {
         this.entidades = [];
@@ -147,7 +160,13 @@ var Pilas = (function () {
     Pilas.prototype.agregar_componente = function (id, componente, opciones) {
         if (opciones === void 0) { opciones = {}; }
         var entidad = this.obtener_entidad_por_id(id);
-        entidad.componentes[componente] = opciones;
+        if (componente instanceof Function) {
+            var instancia = componente();
+            entidad.componentes[instancia.nombre] = Object.assign(instancia.datos, opciones);
+        }
+        else {
+            entidad.componentes[componente] = opciones;
+        }
     };
     Pilas.prototype.obtener_entidad_por_id = function (id) {
         var entidades = this.entidades.entidades.filter(function (a) {
@@ -183,6 +202,7 @@ var Pilas = (function () {
     Pilas.prototype.create = function () {
         this.habilidades = new Habilidades(this);
         this.entidades = new Entidades();
+        this.componentes = new Componentes(this);
         this.cuandoCarga.dispatch();
     };
     Pilas.prototype.update = function () {

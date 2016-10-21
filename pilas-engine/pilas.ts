@@ -14,6 +14,7 @@ class Pilas {
   habilidades: Habilidades;
   contador_de_actualizaciones: number = 0;
   pausado: boolean = false;
+  componentes: Componentes;
 
   constructor(idCanvas) {
     let ancho = 500;
@@ -42,7 +43,13 @@ class Pilas {
   agregar_componente(id, componente, opciones = {}) {
     let entidad = this.obtener_entidad_por_id(id);
 
-    entidad.componentes[componente] = opciones;
+    if (componente instanceof Function) {
+      let instancia = componente();
+      entidad.componentes[instancia.nombre] = (<any>Object).assign(instancia.datos, opciones);
+    } else {
+      entidad.componentes[componente] = opciones;
+    }
+
   }
 
   obtener_entidad_por_id(id) {
@@ -88,6 +95,7 @@ class Pilas {
   create() {
     this.habilidades = new Habilidades(this);
     this.entidades = new Entidades();
+    this.componentes = new Componentes(this);
     this.cuandoCarga.dispatch();
   }
 
