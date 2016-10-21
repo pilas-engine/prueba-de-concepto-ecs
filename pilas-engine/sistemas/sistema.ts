@@ -1,4 +1,4 @@
-class Habilidad {
+class Sistema {
   requisitos: Array<string> = [];
   pilas: Pilas;
 

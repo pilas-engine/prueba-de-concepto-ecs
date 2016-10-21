@@ -1,8 +1,3 @@
-/// <reference path="declaraciones/phaser.d.ts" />
-/// <reference path="declaraciones/pixi.d.ts" />
-/// <reference path="declaraciones/p2.d.ts" />
-/// <reference path="declaraciones/box2d.d.ts" />
-/// <reference path="habilidades.ts" />
 
 class Pilas {
   game: Phaser.Game;
@@ -11,7 +6,7 @@ class Pilas {
   cuandoCarga: Phaser.Signal;
   cuandoActualiza: Phaser.Signal;
 
-  habilidades: Habilidades;
+  sistemas: Sistemas;
   contador_de_actualizaciones: number = 0;
   pausado: boolean = false;
   componentes: Componentes;
@@ -29,17 +24,25 @@ class Pilas {
   }
 
   obtener_entidades() {
-    return this.entidades;
+    return this.entidades.obtener_entidades();
   }
 
   obtener_entidades_como_string() {
-    return JSON.stringify(this.entidades, null, 2);
+    return JSON.stringify(this.obtener_entidades(), null, 2);
   }
 
   obtener_cantidad_de_entidades() {
-    return this.entidades.entidades.length;
+    return this.obtener_entidades().length;
   }
 
+  /**
+   * Agrega un componente con valores iniciales a una entidad.
+   *
+   * El componente se puede agregar especificando un string y conjunto de datos
+   * o desde una función. Por ejemplo:
+   *
+   *    >> pilas.agregar_component(id_entidad, pilas.componentes.apariencia, {imagen: 'pilas.png'})
+   */
   agregar_componente(id, componente, opciones = {}) {
     let entidad = this.obtener_entidad_por_id(id);
 
@@ -93,8 +96,8 @@ class Pilas {
   }
 
   create() {
-    this.habilidades = new Habilidades(this);
-    this.entidades = new Entidades();
+    this.sistemas = new Sistemas(this);
+    this.entidades = new Entidades(this);
     this.componentes = new Componentes(this);
     this.cuandoCarga.dispatch();
   }
@@ -102,7 +105,7 @@ class Pilas {
   update() {
     if (!this.pausado) {
       this.contador_de_actualizaciones += 1;
-      this.habilidades.procesar_sobre_entidades(this.entidades);
+      this.sistemas.procesar_sobre_entidades(this.entidades);
       this.cuandoActualiza.dispatch(this.contador_de_actualizaciones);
     }
   }

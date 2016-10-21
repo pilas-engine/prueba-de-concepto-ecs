@@ -1,6 +1,6 @@
-/// <reference path="habilidad.ts" />
+/// <reference path="../_references.ts" />
 
-class Depurable extends Habilidad {
+class Depurable extends Sistema {
   cache: any = {};
   canvas: any;
 

@@ -1,6 +1,6 @@
-/// <reference path="habilidad.ts" />
+/// <reference path="../_references.ts" />
 
-class Apariencia extends Habilidad {
+class Apariencia extends Sistema {
   cache: any = {};
 
   iniciar() {

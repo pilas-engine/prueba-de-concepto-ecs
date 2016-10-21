@@ -3,6 +3,19 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Sistema = (function () {
+    function Sistema(pilas) {
+        this.requisitos = [];
+        this.pilas = pilas;
+        this.iniciar();
+    }
+    Sistema.prototype.iniciar = function () {
+        this.requisitos = [];
+    };
+    Sistema.prototype.procesar = function (entidades) {
+    };
+    return Sistema;
+}());
 var Componentes = (function () {
     function Componentes(pilas) {
         this.pilas = pilas;
@@ -17,8 +30,9 @@ var Componentes = (function () {
     return Componentes;
 }());
 var Entidades = (function () {
-    function Entidades() {
+    function Entidades(pilas) {
         this.entidades = [];
+        this.pilas = pilas;
     }
     Entidades.prototype.crear_entidad = function (nombre) {
         var id = this.generarID();
@@ -29,113 +43,21 @@ var Entidades = (function () {
         });
         return id;
     };
+    Entidades.prototype.obtener_entidades = function () {
+        return this.entidades;
+    };
     Entidades.prototype.generarID = function () {
         return this.entidades.length + 1;
     };
-    Entidades.prototype.obtener_entidades_con = function (requisitos) {
+    Entidades.prototype.obtener_entidades_con = function (componentes) {
         return this.entidades.filter(function (e) {
-            var tiene_requisito = requisitos.map(function (requisito) {
+            var lista_de_cumplimientos_de_requisito = componentes.map(function (requisito) {
                 return e.componentes.hasOwnProperty(requisito);
             });
-            if (tiene_requisito.indexOf(false) > -1) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return (lista_de_cumplimientos_de_requisito.indexOf(false) === -1);
         });
     };
     return Entidades;
-}());
-var Habilidad = (function () {
-    function Habilidad(pilas) {
-        this.requisitos = [];
-        this.pilas = pilas;
-        this.iniciar();
-    }
-    Habilidad.prototype.iniciar = function () {
-        this.requisitos = [];
-    };
-    Habilidad.prototype.procesar = function (entidades) {
-    };
-    return Habilidad;
-}());
-var Apariencia = (function (_super) {
-    __extends(Apariencia, _super);
-    function Apariencia() {
-        _super.apply(this, arguments);
-        this.cache = {};
-    }
-    Apariencia.prototype.iniciar = function () {
-        this.requisitos = ['posicion', 'apariencia'];
-    };
-    Apariencia.prototype.procesar = function (entidades) {
-        var _this = this;
-        var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
-        var game = this.pilas.game;
-        entidades_filtradas.map(function (entidad) {
-            if (_this.cache[entidad.id]) {
-                var sprite = _this.cache[entidad.id];
-                sprite.position.x = game.world.centerX + entidad.componentes.posicion.x;
-                sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
-            }
-            else {
-                var sprite = void 0;
-                sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'ember');
-                sprite.anchor.set(0.5);
-                game.physics.arcade.enable(sprite);
-                _this.cache[entidad.id] = sprite;
-            }
-        });
-    };
-    return Apariencia;
-}(Habilidad));
-var Depurable = (function (_super) {
-    __extends(Depurable, _super);
-    function Depurable() {
-        _super.apply(this, arguments);
-        this.cache = {};
-    }
-    Depurable.prototype.iniciar = function () {
-        this.requisitos = ['depurable', 'posicion'];
-        this.canvas = this.pilas.game.add.graphics(0, 0);
-        this.canvas.beginFill(0xffffff);
-    };
-    Depurable.prototype.procesar = function (entidades) {
-        var _this = this;
-        var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
-        var game = this.pilas.game;
-        entidades_filtradas.map(function (e) {
-            var x = e.componentes.posicion.x;
-            var y = e.componentes.posicion.y;
-            _this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 50);
-        });
-    };
-    return Depurable;
-}(Habilidad));
-var Habilidades = (function () {
-    function Habilidades(pilas) {
-        this.habilidades = [];
-        this.pilas = pilas;
-        this.inicializar_habilidad(Apariencia);
-        this.inicializar_habilidad(Depurable);
-    }
-    Habilidades.prototype.inicializar_habilidad = function (clase) {
-        try {
-            this.habilidades.push(new clase(this.pilas));
-        }
-        catch (e) {
-            var nombre = clase.name;
-            console.warn("No se puede iniciar la habilidad " + nombre + " se evitar\u00E1 vincular al motor.");
-            console.error(e);
-        }
-    };
-    Habilidades.prototype.procesar_sobre_entidades = function (entidades) {
-        this.habilidades.map(function (habilidad) {
-            habilidad.procesar(entidades);
-        });
-    };
-    return Habilidades;
 }());
 var Pilas = (function () {
     function Pilas(idCanvas) {
@@ -149,13 +71,13 @@ var Pilas = (function () {
         this.cuandoActualiza = new Phaser.Signal();
     }
     Pilas.prototype.obtener_entidades = function () {
-        return this.entidades;
+        return this.entidades.obtener_entidades();
     };
     Pilas.prototype.obtener_entidades_como_string = function () {
-        return JSON.stringify(this.entidades, null, 2);
+        return JSON.stringify(this.obtener_entidades(), null, 2);
     };
     Pilas.prototype.obtener_cantidad_de_entidades = function () {
-        return this.entidades.entidades.length;
+        return this.obtener_entidades().length;
     };
     Pilas.prototype.agregar_componente = function (id, componente, opciones) {
         if (opciones === void 0) { opciones = {}; }
@@ -200,15 +122,15 @@ var Pilas = (function () {
         return opciones;
     };
     Pilas.prototype.create = function () {
-        this.habilidades = new Habilidades(this);
-        this.entidades = new Entidades();
+        this.sistemas = new Sistemas(this);
+        this.entidades = new Entidades(this);
         this.componentes = new Componentes(this);
         this.cuandoCarga.dispatch();
     };
     Pilas.prototype.update = function () {
         if (!this.pausado) {
             this.contador_de_actualizaciones += 1;
-            this.habilidades.procesar_sobre_entidades(this.entidades);
+            this.sistemas.procesar_sobre_entidades(this.entidades);
             this.cuandoActualiza.dispatch(this.contador_de_actualizaciones);
         }
     };
@@ -228,3 +150,80 @@ var pilasengine = {
         return new Pilas(idCanvas);
     }
 };
+var Sistemas = (function () {
+    function Sistemas(pilas) {
+        this.sistemas = [];
+        this.pilas = pilas;
+        this.inicializar_sistema(Apariencia);
+        this.inicializar_sistema(Depurable);
+    }
+    Sistemas.prototype.inicializar_sistema = function (clase) {
+        try {
+            this.sistemas.push(new clase(this.pilas));
+        }
+        catch (e) {
+            var nombre = clase.name;
+            console.warn("No se puede iniciar el sistema " + nombre + " a causa de un error, se evitar\u00E1 vincular al motor.");
+            console.error(e);
+        }
+    };
+    Sistemas.prototype.procesar_sobre_entidades = function (entidades) {
+        this.sistemas.map(function (sistema) {
+            sistema.procesar(entidades);
+        });
+    };
+    return Sistemas;
+}());
+var Apariencia = (function (_super) {
+    __extends(Apariencia, _super);
+    function Apariencia() {
+        _super.apply(this, arguments);
+        this.cache = {};
+    }
+    Apariencia.prototype.iniciar = function () {
+        this.requisitos = ['posicion', 'apariencia'];
+    };
+    Apariencia.prototype.procesar = function (entidades) {
+        var _this = this;
+        var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
+        var game = this.pilas.game;
+        entidades_filtradas.map(function (entidad) {
+            if (_this.cache[entidad.id]) {
+                var sprite = _this.cache[entidad.id];
+                sprite.position.x = game.world.centerX + entidad.componentes.posicion.x;
+                sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
+            }
+            else {
+                var sprite = void 0;
+                sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'ember');
+                sprite.anchor.set(0.5);
+                game.physics.arcade.enable(sprite);
+                _this.cache[entidad.id] = sprite;
+            }
+        });
+    };
+    return Apariencia;
+}(Sistema));
+var Depurable = (function (_super) {
+    __extends(Depurable, _super);
+    function Depurable() {
+        _super.apply(this, arguments);
+        this.cache = {};
+    }
+    Depurable.prototype.iniciar = function () {
+        this.requisitos = ['depurable', 'posicion'];
+        this.canvas = this.pilas.game.add.graphics(0, 0);
+        this.canvas.beginFill(0xffffff);
+    };
+    Depurable.prototype.procesar = function (entidades) {
+        var _this = this;
+        var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
+        var game = this.pilas.game;
+        entidades_filtradas.map(function (e) {
+            var x = e.componentes.posicion.x;
+            var y = e.componentes.posicion.y;
+            _this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 50);
+        });
+    };
+    return Depurable;
+}(Sistema));

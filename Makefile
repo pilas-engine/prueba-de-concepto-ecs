@@ -64,9 +64,9 @@ test_travis:
 	./node_modules/ember-cli/bin/ember test
 
 compilar_pilas:
-	./node_modules/typescript/bin/tsc --pretty
+	./node_modules/typescript/bin/tsc --pretty -d
 
 compilar_pilas_live:
-	./node_modules/typescript/bin/tsc --watch --pretty
+	./node_modules/typescript/bin/tsc --watch --pretty -d
 
 test: test_travis
