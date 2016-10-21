@@ -41,14 +41,18 @@ class Pilas {
    */
   agregar_componente(id, componente, opciones = {}) {
     let entidad = this.obtener_entidad_por_id(id);
+    let nombre = null;
 
     if (componente instanceof Function) {
       let instancia = componente();
+      nombre = instancia.nombre;
       entidad.componentes[instancia.nombre] = (<any>Object).assign(instancia.datos, opciones);
     } else {
+      nombre = componente;
       entidad.componentes[componente] = opciones;
     }
 
+    this.eventos.cuando_agrega_componente.emitir({id, nombre, datos_iniciales: entidad.componentes[nombre]});
   }
 
   obtener_entidad_por_id(id) {

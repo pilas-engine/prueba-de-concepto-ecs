@@ -41,6 +41,7 @@ declare class Eventos {
     cuando_agrega_entidad: Evento;
     cuando_actualiza: Evento;
     cuando_carga: Evento;
+    cuando_agrega_componente: Evento;
     constructor(pilas: Pilas);
 }
 declare class Pilas {

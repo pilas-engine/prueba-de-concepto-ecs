@@ -84,6 +84,7 @@ var Eventos = (function () {
         this.cuando_agrega_entidad = new Evento(pilas);
         this.cuando_actualiza = new Evento(pilas);
         this.cuando_carga = new Evento(pilas);
+        this.cuando_agrega_componente = new Evento(pilas);
     }
     return Eventos;
 }());
@@ -109,13 +110,17 @@ var Pilas = (function () {
     Pilas.prototype.agregar_componente = function (id, componente, opciones) {
         if (opciones === void 0) { opciones = {}; }
         var entidad = this.obtener_entidad_por_id(id);
+        var nombre = null;
         if (componente instanceof Function) {
             var instancia = componente();
+            nombre = instancia.nombre;
             entidad.componentes[instancia.nombre] = Object.assign(instancia.datos, opciones);
         }
         else {
+            nombre = componente;
             entidad.componentes[componente] = opciones;
         }
+        this.eventos.cuando_agrega_componente.emitir({ id: id, nombre: nombre, datos_iniciales: entidad.componentes[nombre] });
     };
     Pilas.prototype.obtener_entidad_por_id = function (id) {
         var entidades = this.entidades.entidades.filter(function (a) {
