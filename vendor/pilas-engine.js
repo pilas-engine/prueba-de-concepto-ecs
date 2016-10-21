@@ -2,7 +2,7 @@ var Entidades = (function () {
     function Entidades() {
         this.entidades = [];
     }
-    Entidades.prototype.crearEntidad = function (nombre) {
+    Entidades.prototype.crear_entidad = function (nombre) {
         var id = this.generarID();
         this.entidades.push({
             id: id,
@@ -19,7 +19,7 @@ var Pilas = (function () {
     function Pilas(idCanvas) {
         var ancho = 500;
         var alto = 300;
-        var opciones = this.obtenerOpciones();
+        var opciones = this.obtener_opciones();
         this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
         this.entidades = new Entidades();
     }
@@ -29,7 +29,7 @@ var Pilas = (function () {
         this.game.stage.disableVisibilityChange = true;
         this.game.load.image('ember', 'imagenes/ember.png');
     };
-    Pilas.prototype.obtenerOpciones = function () {
+    Pilas.prototype.obtener_opciones = function () {
         var _this = this;
         var opciones = {
             preload: function () {
@@ -49,8 +49,8 @@ var Pilas = (function () {
     Pilas.prototype.update = function () {
         this.cuandoActualiza.dispatch();
     };
-    Pilas.prototype.crearEntidad = function (nombre) {
-        return this.entidades.crearEntidad(nombre);
+    Pilas.prototype.crear_entidad = function (nombre) {
+        return this.entidades.crear_entidad(nombre);
     };
     return Pilas;
 }());

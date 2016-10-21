@@ -2,9 +2,9 @@ import Ember from 'ember';
 
 
 export default Ember.Component.extend({
-  entidades: "",
-  cantidad_de_entidades: 0,
-  contador_de_actualizaciones: 0,
+  entidades: null,                    // se actualiza en el método cuandoActualiza
+  cantidad_de_entidades: null,        // se actualiza en el método cuandoActualiza
+  contador_de_actualizaciones: null,  // se actualiza en el método cuandoActualiza
   habilidades: [],
 
   pilas: null,
@@ -27,17 +27,18 @@ export default Ember.Component.extend({
   },
 
   cuandoCarga() {
-    let id = this.get('pilas').crearEntidad('MiActor');
+    let pilas = this.get('pilas');
+    let id = pilas.crear_entidad('MiActor');
 
-    this.get('pilas').agregar_habilidad(id, 'apariencia', {imagen: 'ember'});
-    this.get('pilas').agregar_habilidad(id, 'posicion', {x: 0, y: 0});
-    this.get('pilas').agregar_habilidad(id, 'depurable');
+    pilas.agregar_componente(id, 'apariencia', {imagen: 'ember'});
+    pilas.agregar_componente(id, 'posicion', {x: 0, y: 0});
+    pilas.agregar_componente(id, 'depurable');
   },
 
   cuandoActualiza(contador_de_actualizaciones) {
-    let entidades = this.get('pilas').obtener_entidades_como_string();
-    let cantidad_de_entidades = this.get('pilas').obtener_cantidad_de_entidades();
-
+    let pilas = this.get('pilas');
+    let entidades = pilas.obtener_entidades_como_string();
+    let cantidad_de_entidades = pilas.obtener_cantidad_de_entidades();
 
     this.set('contador_de_actualizaciones', contador_de_actualizaciones);
     this.set('entidades', entidades);

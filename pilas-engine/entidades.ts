@@ -1,13 +1,13 @@
 class Entidades {
   entidades: Array<any> = [];
 
-  crearEntidad(nombre: string) {
+  crear_entidad(nombre: string) {
     let id = this.generarID();
 
     this.entidades.push({
       id: id,
       nombre: nombre,
-      habilidades: {
+      componentes: {
       }
     });
 
@@ -33,7 +33,7 @@ class Entidades {
        * requisitos.
        * Algo como [true, true, false] por ejemplo. */
       let tiene_requisito = requisitos.map(requisito => {
-        return e.habilidades.hasOwnProperty(requisito);
+        return e.componentes.hasOwnProperty(requisito);
       });
 
       if (tiene_requisito.indexOf(false) > -1) {

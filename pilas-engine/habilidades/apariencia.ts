@@ -16,8 +16,8 @@ class Apariencia extends Habilidad {
       if (this.cache[entidad.id]) {
         let sprite = this.cache[entidad.id];
 
-        sprite.position.x = game.world.centerX + entidad.habilidades.posicion.x;
-        sprite.position.y = game.world.centerY - entidad.habilidades.posicion.y;
+        sprite.position.x = game.world.centerX + entidad.componentes.posicion.x;
+        sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
 
       } else {
         let sprite;

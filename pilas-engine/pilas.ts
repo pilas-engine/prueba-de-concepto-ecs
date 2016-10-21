@@ -19,10 +19,9 @@ class Pilas {
     let ancho = 500;
     let alto = 300;
 
-    let opciones = this.obtenerOpciones();
+    let opciones = this.obtener_opciones();
 
     this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
-
 
     this.cuandoCarga = new Phaser.Signal();
     this.cuandoActualiza = new Phaser.Signal();
@@ -40,10 +39,10 @@ class Pilas {
     return this.entidades.entidades.length;
   }
 
-  agregar_habilidad(id, habilidad, opciones = {}) {
+  agregar_componente(id, componente, opciones = {}) {
     let entidad = this.obtener_entidad_por_id(id);
 
-    entidad.habilidades[habilidad] = opciones;
+    entidad.componentes[componente] = opciones;
   }
 
   obtener_entidad_por_id(id) {
@@ -58,22 +57,17 @@ class Pilas {
     }
   }
 
-
   preload() {
-
     // Evita que se active la pausa cuando se pierde el foco del navegador.
     this.game.stage.disableVisibilityChange = true;
 
     this.game.time.desiredFps = 1;
 
-
     // Precarga imágenes
     this.game.load.image('ember', 'imagenes/ember.png');
-
-
   }
 
-  private obtenerOpciones() {
+  private obtener_opciones() {
     let opciones = {
       preload: () => {
         this.preload();
@@ -113,9 +107,10 @@ class Pilas {
     this.pausado = false;
   }
 
-  crearEntidad(nombre) {
-    return this.entidades.crearEntidad(nombre);
+  crear_entidad(nombre) {
+    return this.entidades.crear_entidad(nombre);
   }
+
 }
 
 var pilasengine = {

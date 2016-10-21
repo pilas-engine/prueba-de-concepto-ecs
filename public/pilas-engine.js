@@ -7,12 +7,12 @@ var Entidades = (function () {
     function Entidades() {
         this.entidades = [];
     }
-    Entidades.prototype.crearEntidad = function (nombre) {
+    Entidades.prototype.crear_entidad = function (nombre) {
         var id = this.generarID();
         this.entidades.push({
             id: id,
             nombre: nombre,
-            habilidades: {}
+            componentes: {}
         });
         return id;
     };
@@ -22,7 +22,7 @@ var Entidades = (function () {
     Entidades.prototype.obtener_entidades_con = function (requisitos) {
         return this.entidades.filter(function (e) {
             var tiene_requisito = requisitos.map(function (requisito) {
-                return e.habilidades.hasOwnProperty(requisito);
+                return e.componentes.hasOwnProperty(requisito);
             });
             if (tiene_requisito.indexOf(false) > -1) {
                 return false;
@@ -63,8 +63,8 @@ var Apariencia = (function (_super) {
         entidades_filtradas.map(function (entidad) {
             if (_this.cache[entidad.id]) {
                 var sprite = _this.cache[entidad.id];
-                sprite.position.x = game.world.centerX + entidad.habilidades.posicion.x;
-                sprite.position.y = game.world.centerY - entidad.habilidades.posicion.y;
+                sprite.position.x = game.world.centerX + entidad.componentes.posicion.x;
+                sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
             }
             else {
                 var sprite = void 0;
@@ -93,9 +93,9 @@ var Depurable = (function (_super) {
         var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
         var game = this.pilas.game;
         entidades_filtradas.map(function (e) {
-            var x = e.habilidades.posicion.x;
-            var y = e.habilidades.posicion.y;
-            _this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 100);
+            var x = e.componentes.posicion.x;
+            var y = e.componentes.posicion.y;
+            _this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 50);
         });
     };
     return Depurable;
@@ -130,7 +130,7 @@ var Pilas = (function () {
         this.pausado = false;
         var ancho = 500;
         var alto = 300;
-        var opciones = this.obtenerOpciones();
+        var opciones = this.obtener_opciones();
         this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
         this.cuandoCarga = new Phaser.Signal();
         this.cuandoActualiza = new Phaser.Signal();
@@ -144,10 +144,10 @@ var Pilas = (function () {
     Pilas.prototype.obtener_cantidad_de_entidades = function () {
         return this.entidades.entidades.length;
     };
-    Pilas.prototype.agregar_habilidad = function (id, habilidad, opciones) {
+    Pilas.prototype.agregar_componente = function (id, componente, opciones) {
         if (opciones === void 0) { opciones = {}; }
         var entidad = this.obtener_entidad_por_id(id);
-        entidad.habilidades[habilidad] = opciones;
+        entidad.componentes[componente] = opciones;
     };
     Pilas.prototype.obtener_entidad_por_id = function (id) {
         var entidades = this.entidades.entidades.filter(function (a) {
@@ -165,7 +165,7 @@ var Pilas = (function () {
         this.game.time.desiredFps = 1;
         this.game.load.image('ember', 'imagenes/ember.png');
     };
-    Pilas.prototype.obtenerOpciones = function () {
+    Pilas.prototype.obtener_opciones = function () {
         var _this = this;
         var opciones = {
             preload: function () {
@@ -198,8 +198,8 @@ var Pilas = (function () {
     Pilas.prototype.continuar = function () {
         this.pausado = false;
     };
-    Pilas.prototype.crearEntidad = function (nombre) {
-        return this.entidades.crearEntidad(nombre);
+    Pilas.prototype.crear_entidad = function (nombre) {
+        return this.entidades.crear_entidad(nombre);
     };
     return Pilas;
 }());

@@ -16,9 +16,9 @@ class Depurable extends Habilidad {
     let game = this.pilas.game;
 
     entidades_filtradas.map((e) => {
-      let x = e.habilidades.posicion.x;
-      let y = e.habilidades.posicion.y;
-      this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 100);
+      let x = e.componentes.posicion.x;
+      let y = e.componentes.posicion.y;
+      this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 50);
     })
   }
 
