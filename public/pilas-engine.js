@@ -33,6 +33,23 @@ var Evento = (function () {
     };
     return Evento;
 }());
+var ActorProxy = (function () {
+    function ActorProxy(pilas, id) {
+        this.pilas = pilas;
+        this.id = id;
+    }
+    Object.defineProperty(ActorProxy.prototype, "x", {
+        get: function () {
+            return this.pilas.obtener_entidad_por_id(this.id).componentes.posicion.x;
+        },
+        set: function (valor) {
+            this.pilas.obtener_entidad_por_id(this.id).componentes.posicion.x = valor;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return ActorProxy;
+}());
 var Componentes = (function () {
     function Componentes(pilas) {
         this.pilas = pilas;
@@ -154,6 +171,8 @@ var Pilas = (function () {
         return opciones;
     };
     Pilas.prototype.create = function () {
+        this.grupo_actores = this.game.add.group();
+        this.grupo_gui = this.game.add.group();
         this.sistemas = new Sistemas(this);
         this.entidades = new Entidades(this);
         this.componentes = new Componentes(this);
@@ -177,6 +196,9 @@ var Pilas = (function () {
     };
     Pilas.prototype.azar = function (a, b) {
         return this.game.rnd.integerInRange(a, b);
+    };
+    Pilas.prototype.crear_actor_desde_entidad = function (identificador) {
+        return new ActorProxy(this, identificador);
     };
     return Pilas;
 }());
@@ -235,6 +257,7 @@ var Apariencia = (function (_super) {
                 sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
                 sprite.anchor.set(0.5);
                 game.physics.arcade.enable(sprite);
+                _this.pilas.grupo_actores.add(sprite);
                 _this.cache[entidad.id] = sprite;
             }
         });
@@ -248,19 +271,34 @@ var Depurable = (function (_super) {
         this.cache = {};
     }
     Depurable.prototype.iniciar = function () {
-        this.requisitos = ['depurable', 'posicion'];
+        this.requisitos = ['posicion'];
         this.canvas = this.pilas.game.add.graphics(0, 0);
-        this.canvas.beginFill(0xffffff);
+        this.pilas.grupo_gui.add(this.canvas);
     };
     Depurable.prototype.procesar = function (entidades) {
         var _this = this;
         var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
         var game = this.pilas.game;
+        this.canvas.clear();
+        this.canvas.beginFill(0xffffff);
+        this.canvas.z = -1000;
         entidades_filtradas.map(function (e) {
-            var x = e.componentes.posicion.x;
-            var y = e.componentes.posicion.y;
-            _this.canvas.drawCircle(x + game.world.centerX, game.world.centerY - y, 50);
+            var x = e.componentes.posicion.x + game.world.centerX;
+            var y = game.world.centerY - e.componentes.posicion.y;
+            _this._dibujar_cruz_del_punto_de_control(_this.canvas, x, y);
         });
+    };
+    Depurable.prototype._dibujar_cruz_del_punto_de_control = function (canvas, x, y) {
+        canvas.lineStyle(4, 0x000000, 1);
+        this._dibujar_cruz(this.canvas, x, y, 4);
+        canvas.lineStyle(2, 0xffffff, 1);
+        this._dibujar_cruz(this.canvas, x, y, 4 - 1);
+    };
+    Depurable.prototype._dibujar_cruz = function (canvas, x, y, l) {
+        canvas.moveTo(x - l, y - l);
+        canvas.lineTo(x + l, y + l);
+        canvas.moveTo(x - l, y + l);
+        canvas.lineTo(x + l, y - l);
     };
     return Depurable;
 }(Sistema));

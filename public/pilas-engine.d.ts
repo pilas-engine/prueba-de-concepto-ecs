@@ -17,6 +17,12 @@ declare class Evento {
     conectar(funcion: any, identificador: any): void;
     emitir(datos?: {}): void;
 }
+declare class ActorProxy {
+    pilas: Pilas;
+    id: any;
+    constructor(pilas: Pilas, id: any);
+    x: any;
+}
 declare class Componentes {
     pilas: Pilas;
     constructor(pilas: any);
@@ -52,6 +58,8 @@ declare class Pilas {
     pausado: boolean;
     componentes: Componentes;
     eventos: Eventos;
+    grupo_actores: Phaser.Group;
+    grupo_gui: Phaser.Group;
     constructor(idCanvas: any);
     obtener_entidades(): any[];
     obtener_entidades_como_string(): string;
@@ -66,6 +74,7 @@ declare class Pilas {
     continuar(): void;
     crear_entidad(nombre: any): number;
     azar(a: number, b: number): number;
+    crear_actor_desde_entidad(identificador: any): ActorProxy;
 }
 declare var pilasengine: {
     iniciar: (idCanvas: any) => Pilas;
@@ -87,4 +96,6 @@ declare class Depurable extends Sistema {
     canvas: any;
     iniciar(): void;
     procesar(entidades: Entidades): void;
+    _dibujar_cruz_del_punto_de_control(canvas: any, x: any, y: any): void;
+    _dibujar_cruz(canvas: any, x: any, y: any, l: any): void;
 }

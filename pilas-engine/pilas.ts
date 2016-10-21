@@ -10,6 +10,9 @@ class Pilas {
   componentes: Componentes;
   eventos: Eventos;
 
+  grupo_actores: Phaser.Group;
+  grupo_gui: Phaser.Group;
+
   constructor(idCanvas) {
     let ancho = 500;
     let alto = 300;
@@ -91,12 +94,23 @@ class Pilas {
       update: () => {
         this.update();
       },
+
+      /*
+      render: () => {
+        this.game.debug.text('sky layer:', 5, 15);
+        this.game.debug.text('sky 123 layer:', 5, 35);
+      }
+      */
+
     };
 
     return opciones;
   }
 
   create() {
+    this.grupo_actores = this.game.add.group();
+    this.grupo_gui = this.game.add.group();
+
     this.sistemas = new Sistemas(this);
     this.entidades = new Entidades(this);
     this.componentes = new Componentes(this);
@@ -104,6 +118,7 @@ class Pilas {
   }
 
   update() {
+
     if (!this.pausado) {
       this.contador_de_actualizaciones += 1;
       this.sistemas.procesar_sobre_entidades(this.entidades);
@@ -128,6 +143,10 @@ class Pilas {
    */
   azar(a: number, b: number) {
     return this.game.rnd.integerInRange(a, b);
+  }
+
+  crear_actor_desde_entidad(identificador) {
+    return new ActorProxy(this, identificador);
   }
 
 }

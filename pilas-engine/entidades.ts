@@ -2,10 +2,19 @@ class Entidades {
   entidades: Array<any> = [];
   pilas: Pilas;
 
+  /**
+   * Construye el subsistema de entidades.
+   */
   constructor(pilas: Pilas) {
     this.pilas = pilas;
   }
 
+  /**
+   * Permite crear una entidad y agregarla al arbol de entidades del escenario.
+   *
+   * Esta función generará la entidad y retornará el identificador asignado
+   * para la entidad.
+   */
   crear_entidad(nombre: string) {
     let id = this.generarID();
     let datos = {
@@ -22,10 +31,13 @@ class Entidades {
     return id;
   }
 
+
+  /**
+   * Retorna una lista con todas las entidades instanciadas.
+   */
   obtener_entidades() {
     return this.entidades;
   }
-
 
   /**
    * Genera un identificador interno único para cada entidad.

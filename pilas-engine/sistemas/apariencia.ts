@@ -32,6 +32,9 @@ class Apariencia extends Sistema {
         //  And enable the Sprite to have a physics body:
         game.physics.arcade.enable(sprite);
 
+        // Agrega este actor al grupo de actores.
+        this.pilas.grupo_actores.add(sprite);
+
         this.cache[entidad.id] = sprite;
       }
 
