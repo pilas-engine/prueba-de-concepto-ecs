@@ -30,8 +30,6 @@ export default Ember.Component.extend({
   },
 
   cuando_carga() {
-    let pilas = this.get('pilas');
-
     this.send("crearActorAleatorio");
   },
 
