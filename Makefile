@@ -24,6 +24,7 @@ comandos:
 	@echo ""
 	@echo "    ${G}compilar_pilas${N}      Compila la extensión de pilasweb en public/libs."
 	@echo "    ${G}compilar_pilas_live${N} Compila de forma contínua la extensión de pilasweb."
+	@echo "    ${G}api_docs${N}                Genera la documentación de la api."
 	@echo ""
 	@echo "  ${Y}Para distribuir${N}"
 	@echo ""
@@ -70,3 +71,7 @@ compilar_pilas_live:
 	./node_modules/typescript/bin/tsc --watch --pretty -d
 
 test: test_travis
+
+
+api_docs:
+	./node_modules/.bin/typedoc --out api_docs pilas-engine --hideGenerator

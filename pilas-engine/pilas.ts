@@ -1,4 +1,5 @@
 
+
 class Pilas {
   game: Phaser.Game;
   entidades: Entidades;
