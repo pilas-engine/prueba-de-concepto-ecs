@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 
 export default Ember.Component.extend({
-  entidades: null,                    // se actualiza en el método cuandoActualiza
+  entidades: null,                    // se actualiza en el método cuando_actualiza
   cantidad_de_entidades: null,        // se actualiza en el método cuandoActualiza
   contador_de_actualizaciones: null,  // se actualiza en el método cuandoActualiza
   habilidades: [],
@@ -13,31 +13,29 @@ export default Ember.Component.extend({
     let idCanvas = "canvas";
     let pilas = pilasengine.iniciar(idCanvas);
 
-    pilas.cuandoCarga.add(() => {
-      this.cuandoCarga();
+    pilas.eventos.cuando_agrega_entidad.conectar((entidad) => {
+      console.log("Se agregó esta entidad", entidad);
     });
 
-    pilas.cuandoActualiza.add((contador_de_actualizaciones) => {
-      this.cuandoActualiza(contador_de_actualizaciones);
+    pilas.eventos.cuando_carga.conectar(() => {
+      this.cuando_carga();
+    });
+
+    pilas.eventos.cuando_actualiza.conectar((contador_de_actualizaciones) => {
+      this.cuando_actualiza(contador_de_actualizaciones);
     });
 
     this.set('pilas', pilas);
-
     window['pilas'] = pilas;
   },
 
-  cuandoCarga() {
+  cuando_carga() {
     let pilas = this.get('pilas');
-    let id = pilas.crear_entidad('MiActor');
 
-    pilas.agregar_componente(id, 'apariencia', {imagen: 'ember'});
-    pilas.agregar_componente(id, 'posicion', {x: 0, y: 0});
-    pilas.agregar_componente(id, 'depurable');
-
-    pilas.agregar_componente(id, pilas.componentes.etiquetable);
+    this.send("crearActorAleatorio");
   },
 
-  cuandoActualiza(contador_de_actualizaciones) {
+  cuando_actualiza(contador_de_actualizaciones) {
     let pilas = this.get('pilas');
     let entidades = pilas.obtener_entidades_como_string();
     let cantidad_de_entidades = pilas.obtener_cantidad_de_entidades();
@@ -46,5 +44,21 @@ export default Ember.Component.extend({
     this.set('entidades', entidades);
     this.set('cantidad_de_entidades', cantidad_de_entidades);
   },
+
+
+  actions: {
+    crearActorAleatorio() {
+      let pilas = this.get('pilas');
+      let id = pilas.crear_entidad('MiActor');
+      let x = pilas.azar(-100, 100);
+      let y = pilas.azar(-100, 100);
+
+      pilas.agregar_componente(id, 'posicion', {x, y});
+      pilas.agregar_componente(id, 'apariencia', {imagen: 'ember'});
+      pilas.agregar_componente(id, 'depurable');
+
+      pilas.agregar_componente(id, pilas.componentes.etiquetable);
+    }
+  }
 
 });

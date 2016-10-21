@@ -22,7 +22,11 @@ class Apariencia extends Sistema {
       } else {
         let sprite;
 
-        sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'ember');
+        sprite = game.add.sprite(0, 0, 'ember');
+
+        sprite.position.x = game.world.centerX + entidad.componentes.posicion.x;
+        sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
+
         sprite.anchor.set(0.5);
 
         //  And enable the Sprite to have a physics body:

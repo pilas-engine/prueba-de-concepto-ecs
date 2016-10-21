@@ -8,13 +8,16 @@ class Entidades {
 
   crear_entidad(nombre: string) {
     let id = this.generarID();
-
-    this.entidades.push({
+    let datos = {
       id: id,
       nombre: nombre,
       componentes: {
       }
-    });
+    };
+
+    this.entidades.push(datos);
+
+    this.pilas.eventos.cuando_agrega_entidad.emitir(datos);
 
     return id;
   }

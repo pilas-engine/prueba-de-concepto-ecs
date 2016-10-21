@@ -16,6 +16,23 @@ var Sistema = (function () {
     };
     return Sistema;
 }());
+var Evento = (function () {
+    function Evento(pilas) {
+        this.pilas = pilas;
+        this.iniciar();
+    }
+    Evento.prototype.iniciar = function () {
+        this.evento = new Phaser.Signal();
+    };
+    Evento.prototype.conectar = function (funcion, identificador) {
+        this.evento.add(funcion);
+    };
+    Evento.prototype.emitir = function (datos) {
+        if (datos === void 0) { datos = {}; }
+        this.evento.dispatch(datos);
+    };
+    return Evento;
+}());
 var Componentes = (function () {
     function Componentes(pilas) {
         this.pilas = pilas;
@@ -36,11 +53,13 @@ var Entidades = (function () {
     }
     Entidades.prototype.crear_entidad = function (nombre) {
         var id = this.generarID();
-        this.entidades.push({
+        var datos = {
             id: id,
             nombre: nombre,
             componentes: {}
-        });
+        };
+        this.entidades.push(datos);
+        this.pilas.eventos.cuando_agrega_entidad.emitir(datos);
         return id;
     };
     Entidades.prototype.obtener_entidades = function () {
@@ -59,6 +78,15 @@ var Entidades = (function () {
     };
     return Entidades;
 }());
+var Eventos = (function () {
+    function Eventos(pilas) {
+        this.pilas = pilas;
+        this.cuando_agrega_entidad = new Evento(pilas);
+        this.cuando_actualiza = new Evento(pilas);
+        this.cuando_carga = new Evento(pilas);
+    }
+    return Eventos;
+}());
 var Pilas = (function () {
     function Pilas(idCanvas) {
         this.contador_de_actualizaciones = 0;
@@ -67,8 +95,7 @@ var Pilas = (function () {
         var alto = 300;
         var opciones = this.obtener_opciones();
         this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
-        this.cuandoCarga = new Phaser.Signal();
-        this.cuandoActualiza = new Phaser.Signal();
+        this.eventos = new Eventos(this);
     }
     Pilas.prototype.obtener_entidades = function () {
         return this.entidades.obtener_entidades();
@@ -125,13 +152,13 @@ var Pilas = (function () {
         this.sistemas = new Sistemas(this);
         this.entidades = new Entidades(this);
         this.componentes = new Componentes(this);
-        this.cuandoCarga.dispatch();
+        this.eventos.cuando_carga.emitir();
     };
     Pilas.prototype.update = function () {
         if (!this.pausado) {
             this.contador_de_actualizaciones += 1;
             this.sistemas.procesar_sobre_entidades(this.entidades);
-            this.cuandoActualiza.dispatch(this.contador_de_actualizaciones);
+            this.eventos.cuando_actualiza.emitir(this.contador_de_actualizaciones);
         }
     };
     Pilas.prototype.pausar = function () {
@@ -142,6 +169,9 @@ var Pilas = (function () {
     };
     Pilas.prototype.crear_entidad = function (nombre) {
         return this.entidades.crear_entidad(nombre);
+    };
+    Pilas.prototype.azar = function (a, b) {
+        return this.game.rnd.integerInRange(a, b);
     };
     return Pilas;
 }());
@@ -154,8 +184,8 @@ var Sistemas = (function () {
     function Sistemas(pilas) {
         this.sistemas = [];
         this.pilas = pilas;
-        this.inicializar_sistema(Apariencia);
         this.inicializar_sistema(Depurable);
+        this.inicializar_sistema(Apariencia);
     }
     Sistemas.prototype.inicializar_sistema = function (clase) {
         try {
@@ -195,7 +225,9 @@ var Apariencia = (function (_super) {
             }
             else {
                 var sprite = void 0;
-                sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'ember');
+                sprite = game.add.sprite(0, 0, 'ember');
+                sprite.position.x = game.world.centerX + entidad.componentes.posicion.x;
+                sprite.position.y = game.world.centerY - entidad.componentes.posicion.y;
                 sprite.anchor.set(0.5);
                 game.physics.arcade.enable(sprite);
                 _this.cache[entidad.id] = sprite;

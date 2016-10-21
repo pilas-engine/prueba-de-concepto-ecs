@@ -4,3 +4,4 @@
 /// <reference path="declaraciones/box2d.d.ts" />
 
 /// <reference path="sistemas/sistema.ts" />
+/// <reference path="eventos/evento.ts" />

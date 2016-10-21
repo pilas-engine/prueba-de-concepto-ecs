@@ -3,13 +3,11 @@ class Pilas {
   game: Phaser.Game;
   entidades: Entidades;
 
-  cuandoCarga: Phaser.Signal;
-  cuandoActualiza: Phaser.Signal;
-
   sistemas: Sistemas;
   contador_de_actualizaciones: number = 0;
   pausado: boolean = false;
   componentes: Componentes;
+  eventos: Eventos;
 
   constructor(idCanvas) {
     let ancho = 500;
@@ -18,9 +16,7 @@ class Pilas {
     let opciones = this.obtener_opciones();
 
     this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
-
-    this.cuandoCarga = new Phaser.Signal();
-    this.cuandoActualiza = new Phaser.Signal();
+    this.eventos = new Eventos(this);
   }
 
   obtener_entidades() {
@@ -99,14 +95,14 @@ class Pilas {
     this.sistemas = new Sistemas(this);
     this.entidades = new Entidades(this);
     this.componentes = new Componentes(this);
-    this.cuandoCarga.dispatch();
+    this.eventos.cuando_carga.emitir();
   }
 
   update() {
     if (!this.pausado) {
       this.contador_de_actualizaciones += 1;
       this.sistemas.procesar_sobre_entidades(this.entidades);
-      this.cuandoActualiza.dispatch(this.contador_de_actualizaciones);
+      this.eventos.cuando_actualiza.emitir(this.contador_de_actualizaciones);
     }
   }
 
@@ -120,6 +116,13 @@ class Pilas {
 
   crear_entidad(nombre) {
     return this.entidades.crear_entidad(nombre);
+  }
+
+  /**
+   * Retorna un número al azar entre a y b.
+   */
+  azar(a: number, b: number) {
+    return this.game.rnd.integerInRange(a, b);
   }
 
 }

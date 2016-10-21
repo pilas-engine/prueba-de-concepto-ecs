@@ -9,6 +9,14 @@ declare class Sistema {
     iniciar(): void;
     procesar(entidades: Entidades): void;
 }
+declare class Evento {
+    pilas: Pilas;
+    evento: Phaser.Signal;
+    constructor(pilas: Pilas);
+    iniciar(): void;
+    conectar(funcion: any, identificador: any): void;
+    emitir(datos?: {}): void;
+}
 declare class Componentes {
     pilas: Pilas;
     constructor(pilas: any);
@@ -28,15 +36,21 @@ declare class Entidades {
     private generarID();
     obtener_entidades_con(componentes: Array<string>): any[];
 }
+declare class Eventos {
+    pilas: Pilas;
+    cuando_agrega_entidad: Evento;
+    cuando_actualiza: Evento;
+    cuando_carga: Evento;
+    constructor(pilas: Pilas);
+}
 declare class Pilas {
     game: Phaser.Game;
     entidades: Entidades;
-    cuandoCarga: Phaser.Signal;
-    cuandoActualiza: Phaser.Signal;
     sistemas: Sistemas;
     contador_de_actualizaciones: number;
     pausado: boolean;
     componentes: Componentes;
+    eventos: Eventos;
     constructor(idCanvas: any);
     obtener_entidades(): any[];
     obtener_entidades_como_string(): string;
@@ -50,6 +64,7 @@ declare class Pilas {
     pausar(): void;
     continuar(): void;
     crear_entidad(nombre: any): number;
+    azar(a: number, b: number): number;
 }
 declare var pilasengine: {
     iniciar: (idCanvas: any) => Pilas;

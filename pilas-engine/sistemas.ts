@@ -5,8 +5,8 @@ class Sistemas {
   constructor(pilas: Pilas) {
     this.pilas = pilas;
 
-    this.inicializar_sistema(Apariencia);
     this.inicializar_sistema(Depurable);
+    this.inicializar_sistema(Apariencia);
   }
 
   inicializar_sistema(clase) {
