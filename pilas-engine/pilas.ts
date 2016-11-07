@@ -3,12 +3,14 @@
 class Pilas {
   game: Phaser.Game;
   entidades: Entidades;
+  actores: Actores;
 
   sistemas: Sistemas;
   contador_de_actualizaciones: number = 0;
   pausado: boolean = false;
   componentes: Componentes;
   eventos: Eventos;
+  validadores: Validadores;
 
   grupo_actores: Phaser.Group;
   grupo_gui: Phaser.Group;
@@ -21,6 +23,7 @@ class Pilas {
 
     this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
     this.eventos = new Eventos(this);
+    this.validadores = new Validadores(this);
   }
 
   obtener_entidades() {
@@ -114,6 +117,7 @@ class Pilas {
     this.sistemas = new Sistemas(this);
     this.entidades = new Entidades(this);
     this.componentes = new Componentes(this);
+    this.actores = new Actores(this);
     this.eventos.cuando_carga.emitir();
   }
 

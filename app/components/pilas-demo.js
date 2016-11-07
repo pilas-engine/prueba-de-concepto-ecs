@@ -53,6 +53,7 @@ export default Ember.Component.extend({
 
       pilas.agregar_componente(id, 'posicion', {x, y});
       pilas.agregar_componente(id, 'apariencia', {imagen: 'ember'});
+
       //pilas.agregar_componente(id, 'depurable');
 
       pilas.agregar_componente(id, pilas.componentes.etiquetable);

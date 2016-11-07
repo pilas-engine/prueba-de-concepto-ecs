@@ -33,6 +33,24 @@ var Evento = (function () {
     };
     return Evento;
 }());
+var Actores = (function () {
+    function Actores(pilas) {
+        this.pilas = pilas;
+        this['Aceituna'] = this.aceituna;
+    }
+    Actores.prototype.aceituna = function (x, y) {
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        var id = this.pilas.crear_entidad('MiActor');
+        this.pilas.validadores.solo_numero_o_interpolacion(x, 'definir valor inicial de x para el actor');
+        this.pilas.validadores.solo_numero_o_interpolacion(y, 'definir valor inicial de y para el actor');
+        this.pilas.agregar_componente(id, 'posicion', { x: x, y: y });
+        this.pilas.agregar_componente(id, 'apariencia', { imagen: 'ember' });
+        this.pilas.agregar_componente(id, this.pilas.componentes.etiquetable);
+        return this.pilas.crear_actor_desde_entidad(id);
+    };
+    return Actores;
+}());
 var ActorProxy = (function () {
     function ActorProxy(pilas, id) {
         this.pilas = pilas;
@@ -43,6 +61,7 @@ var ActorProxy = (function () {
             return this.pilas.obtener_entidad_por_id(this.id).componentes.posicion.x;
         },
         set: function (valor) {
+            this.pilas.validadores.solo_numero_o_interpolacion(valor, 'definir valor x del actor');
             this.pilas.obtener_entidad_por_id(this.id).componentes.posicion.x = valor;
         },
         enumerable: true,
@@ -114,6 +133,7 @@ var Pilas = (function () {
         var opciones = this.obtener_opciones();
         this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
         this.eventos = new Eventos(this);
+        this.validadores = new Validadores(this);
     }
     Pilas.prototype.obtener_entidades = function () {
         return this.entidades.obtener_entidades();
@@ -176,6 +196,7 @@ var Pilas = (function () {
         this.sistemas = new Sistemas(this);
         this.entidades = new Entidades(this);
         this.componentes = new Componentes(this);
+        this.actores = new Actores(this);
         this.eventos.cuando_carga.emitir();
     };
     Pilas.prototype.update = function () {
@@ -302,3 +323,27 @@ var Depurable = (function (_super) {
     };
     return Depurable;
 }(Sistema));
+var Validadores = (function () {
+    function Validadores(pilas) {
+        this.pilas = pilas;
+    }
+    Validadores.prototype.solo_numero_o_interpolacion = function (valor, mensaje_de_contexto) {
+        if (mensaje_de_contexto === void 0) { mensaje_de_contexto = undefined; }
+        function es_un_numero(x) {
+            return (!isNaN(x));
+        }
+        if (es_un_numero(valor)) {
+            return true;
+        }
+        if (Array.isArray(valor)) {
+            if (valor.every(es_un_numero)) {
+                return true;
+            }
+        }
+        if (mensaje_de_contexto) {
+            throw new Error("Solo se permite asignar un n\u00FAmero o una lista de n\u00FAmeros, fall\u00F3 al " + mensaje_de_contexto + ", se quiso asignar el valor " + valor + ".");
+        }
+        throw new Error("Solo se permite asignar un número o una lista de números.");
+    };
+    return Validadores;
+}());

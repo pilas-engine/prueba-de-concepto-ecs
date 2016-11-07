@@ -17,6 +17,11 @@ declare class Evento {
     conectar(funcion: any, identificador: any): void;
     emitir(datos?: {}): void;
 }
+declare class Actores {
+    pilas: Pilas;
+    constructor(pilas: Pilas);
+    aceituna(x?: number, y?: number): ActorProxy;
+}
 declare class ActorProxy {
     pilas: Pilas;
     id: any;
@@ -53,11 +58,13 @@ declare class Eventos {
 declare class Pilas {
     game: Phaser.Game;
     entidades: Entidades;
+    actores: Actores;
     sistemas: Sistemas;
     contador_de_actualizaciones: number;
     pausado: boolean;
     componentes: Componentes;
     eventos: Eventos;
+    validadores: Validadores;
     grupo_actores: Phaser.Group;
     grupo_gui: Phaser.Group;
     constructor(idCanvas: any);
@@ -98,4 +105,9 @@ declare class Depurable extends Sistema {
     procesar(entidades: Entidades): void;
     _dibujar_cruz_del_punto_de_control(canvas: any, x: any, y: any): void;
     _dibujar_cruz(canvas: any, x: any, y: any, l: any): void;
+}
+declare class Validadores {
+    pilas: Pilas;
+    constructor(pilas: Pilas);
+    solo_numero_o_interpolacion(valor: any, mensaje_de_contexto?: string): boolean;
 }
