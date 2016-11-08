@@ -13,12 +13,18 @@ export default Ember.Component.extend({
     let idCanvas = "canvas";
     let pilas = pilasengine.iniciar(idCanvas);
 
-    pilas.eventos.cuando_agrega_entidad.conectar((entidad) => {
-      console.log("Se agregó esta entidad", entidad);
+    pilas.log.habilitar();
+
+    pilas.eventos.cuando_agrega_entidad.conectar((/*entidad*/) => {
+      // console.log("Se agregó esta entidad", entidad);
     });
 
     pilas.eventos.cuando_carga.conectar(() => {
       this.cuando_carga();
+    });
+
+    pilas.eventos.cuando_hace_click.conectar((datos_del_mouse) => {
+      console.log(datos_del_mouse);
     });
 
     pilas.eventos.cuando_actualiza.conectar((contador_de_actualizaciones) => {
@@ -30,6 +36,44 @@ export default Ember.Component.extend({
   },
 
   cuando_carga() {
+    let pilas = this.get('pilas');
+
+    let habilidad = {
+      velocidad: 1,
+
+      actualizar: function() {
+        this.actor.x += this.velocidad;
+      }
+
+    };
+
+    pilas.habilidades.vincular('girar todo el tiempo', habilidad);
+
+
+    let volver_al_centro = {
+
+      actualizar: function() {
+        if (this.actor.x  > 300) {
+          this.actor.x = 0;
+        }
+      }
+
+    };
+
+    pilas.habilidades.vincular('volver al centro', volver_al_centro);
+
+
+    let ir_a_donde_hacen_click = {
+
+      cuando_hace_click(mouse) {
+        this.actor.x = mouse.x;
+        this.actor.y = mouse.y;
+      }
+
+    };
+
+    pilas.habilidades.vincular('ir a donde hacen click', ir_a_donde_hacen_click);
+
     this.send("crearActorAleatorio");
   },
 
@@ -57,8 +101,13 @@ export default Ember.Component.extend({
       //pilas.agregar_componente(id, 'depurable');
 
       pilas.agregar_componente(id, pilas.componentes.etiquetable);
+      pilas.agregar_componente(id, pilas.componentes.habilidades);
 
       let actor = pilas.crear_actor_desde_entidad(id);
+
+      pilas.agregar_habilidad(id, 'girar todo el tiempo');
+      pilas.agregar_habilidad(id, 'volver al centro');
+      pilas.agregar_habilidad(id, 'ir a donde hacen click');
 
       window['mi_actor'] = actor;
 

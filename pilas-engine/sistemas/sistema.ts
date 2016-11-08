@@ -19,4 +19,5 @@ class Sistema {
    */
   procesar(entidades: Entidades) {
   }
+
 }

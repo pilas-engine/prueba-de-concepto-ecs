@@ -11,9 +11,13 @@ class Pilas {
   componentes: Componentes;
   eventos: Eventos;
   validadores: Validadores;
+  habilidades: Habilidades;
+  log: Log;
+  utils: Utils;
 
   grupo_actores: Phaser.Group;
   grupo_gui: Phaser.Group;
+
 
   constructor(idCanvas) {
     let ancho = 500;
@@ -22,8 +26,11 @@ class Pilas {
     let opciones = this.obtener_opciones();
 
     this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
+
+    this.log = new Log(this);
     this.eventos = new Eventos(this);
     this.validadores = new Validadores(this);
+    this.utils = new Utils(this);
   }
 
   obtener_entidades() {
@@ -44,7 +51,7 @@ class Pilas {
    * El componente se puede agregar especificando un string y conjunto de datos
    * o desde una función. Por ejemplo:
    *
-   *    >> pilas.agregar_component(id_entidad, pilas.componentes.apariencia, {imagen: 'pilas.png'})
+   *    >> pilas.agregar_componente(id_entidad, pilas.componentes.apariencia, {imagen: 'pilas.png'})
    */
   agregar_componente(id, componente, opciones = {}) {
     let entidad = this.obtener_entidad_por_id(id);
@@ -60,6 +67,13 @@ class Pilas {
     }
 
     this.eventos.cuando_agrega_componente.emitir({id, nombre, datos_iniciales: entidad.componentes[nombre]});
+  }
+
+  agregar_habilidad(id, nombre_de_la_habilidad: string) {
+    let entidad = this.obtener_entidad_por_id(id);
+    entidad.componentes['habilidades'].habilidades.push(nombre_de_la_habilidad);
+
+    // -- this.eventos.cuando_agrega_habilidad.emitir({id, nombre, datos_iniciales: entidad.componentes[nombre]});
   }
 
   obtener_entidad_por_id(id) {
@@ -118,16 +132,21 @@ class Pilas {
     this.entidades = new Entidades(this);
     this.componentes = new Componentes(this);
     this.actores = new Actores(this);
+    this.habilidades = new Habilidades(this);
     this.eventos.cuando_carga.emitir();
   }
 
   update() {
+
 
     if (!this.pausado) {
       this.contador_de_actualizaciones += 1;
       this.sistemas.procesar_sobre_entidades(this.entidades);
       this.eventos.cuando_actualiza.emitir(this.contador_de_actualizaciones);
     }
+
+    this.eventos.limpiar();
+
   }
 
   pausar() {

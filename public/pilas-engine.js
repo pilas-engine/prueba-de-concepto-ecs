@@ -17,18 +17,25 @@ var Sistema = (function () {
     return Sistema;
 }());
 var Evento = (function () {
-    function Evento(pilas) {
+    function Evento(pilas, nombre) {
+        this.emitir_log = true;
         this.pilas = pilas;
         this.iniciar();
+        this.nombre = nombre;
     }
     Evento.prototype.iniciar = function () {
         this.evento = new Phaser.Signal();
     };
     Evento.prototype.conectar = function (funcion, identificador) {
+        if (identificador === void 0) { identificador = "any"; }
+        this.pilas.log.info("Se conecta una funci\u00F3n al evento \"" + this.nombre + "\":", { funcion: funcion.toString() });
         this.evento.add(funcion);
     };
     Evento.prototype.emitir = function (datos) {
         if (datos === void 0) { datos = {}; }
+        if (this.emitir_log) {
+            this.pilas.log.info("Se emite el evento \"" + this.nombre + "\":", { argumentos: datos });
+        }
         this.evento.dispatch(datos);
     };
     return Evento;
@@ -80,6 +87,14 @@ var Componentes = (function () {
         };
         return { nombre: nombre, datos: datos };
     };
+    Componentes.prototype.habilidades = function () {
+        return {
+            nombre: 'habilidades',
+            datos: {
+                habilidades: []
+            }
+        };
+    };
     return Componentes;
 }());
 var Entidades = (function () {
@@ -116,13 +131,73 @@ var Entidades = (function () {
 }());
 var Eventos = (function () {
     function Eventos(pilas) {
+        var _this = this;
+        this._eventos = [];
         this.pilas = pilas;
-        this.cuando_agrega_entidad = new Evento(pilas);
-        this.cuando_actualiza = new Evento(pilas);
-        this.cuando_carga = new Evento(pilas);
-        this.cuando_agrega_componente = new Evento(pilas);
+        this.cuando_carga = new Evento(pilas, 'cuando_carga');
+        this.cuando_actualiza = new Evento(pilas, 'cuando_actualiza');
+        this.cuando_actualiza.emitir_log = false;
+        this.cuando_agrega_entidad = new Evento(pilas, 'cuando_agrega_entidad');
+        this.cuando_agrega_componente = new Evento(pilas, 'cuando_agrega_componente');
+        this.cuando_vincula_habilidad = new Evento(pilas, 'cuando_vincula_habilidad');
+        this.cuando_hace_click = new Evento(pilas, 'cuando_hace_click');
+        this.cuando_carga.conectar(function () {
+            _this._conectar_eventos();
+        });
     }
+    Eventos.prototype._conectar_eventos = function () {
+        var _this = this;
+        this.pilas.game.input.onDown.add(function (pointer) {
+            _this._eventos.push({ tipo: 'cuando_hace_click', x: pointer.x, y: pointer.y });
+        });
+    };
+    Eventos.prototype.limpiar = function () {
+        if (this._eventos.length > 0) {
+            var cantidad = this._eventos.length;
+            if (cantidad === 1) {
+                this.pilas.log.info("Limpiando eventos, se eliminar\u00E1 un solo evento.");
+            }
+            else {
+                this.pilas.log.info("Limpiando eventos, se eliminar\u00E1n " + cantidad + " eventos.");
+            }
+        }
+        this._eventos = [];
+    };
     return Eventos;
+}());
+var Habilidades = (function () {
+    function Habilidades(pilas) {
+        this.pilas = pilas;
+        this._habilidades = [];
+    }
+    Habilidades.prototype.vincular = function (nombre, objeto) {
+        this.pilas.eventos.cuando_vincula_habilidad.emitir({ nombre: nombre, objeto: objeto });
+        this._habilidades[nombre] = objeto;
+    };
+    return Habilidades;
+}());
+var Log = (function () {
+    function Log(pilas) {
+        this.habilitado = false;
+        this.pilas = pilas;
+    }
+    Log.prototype.info = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i - 0] = arguments[_i];
+        }
+        if (this.habilitado) {
+            var args = Array.prototype.slice.call(arguments);
+            console.info.apply(console, args);
+        }
+    };
+    Log.prototype.habilitar = function () {
+        this.habilitado = true;
+    };
+    Log.prototype.deshabilitar = function () {
+        this.habilitado = false;
+    };
+    return Log;
 }());
 var Pilas = (function () {
     function Pilas(idCanvas) {
@@ -132,8 +207,10 @@ var Pilas = (function () {
         var alto = 300;
         var opciones = this.obtener_opciones();
         this.game = new Phaser.Game(ancho, alto, Phaser.CANVAS, idCanvas, opciones);
+        this.log = new Log(this);
         this.eventos = new Eventos(this);
         this.validadores = new Validadores(this);
+        this.utils = new Utils(this);
     }
     Pilas.prototype.obtener_entidades = function () {
         return this.entidades.obtener_entidades();
@@ -158,6 +235,10 @@ var Pilas = (function () {
             entidad.componentes[componente] = opciones;
         }
         this.eventos.cuando_agrega_componente.emitir({ id: id, nombre: nombre, datos_iniciales: entidad.componentes[nombre] });
+    };
+    Pilas.prototype.agregar_habilidad = function (id, nombre_de_la_habilidad) {
+        var entidad = this.obtener_entidad_por_id(id);
+        entidad.componentes['habilidades'].habilidades.push(nombre_de_la_habilidad);
     };
     Pilas.prototype.obtener_entidad_por_id = function (id) {
         var entidades = this.entidades.entidades.filter(function (a) {
@@ -197,6 +278,7 @@ var Pilas = (function () {
         this.entidades = new Entidades(this);
         this.componentes = new Componentes(this);
         this.actores = new Actores(this);
+        this.habilidades = new Habilidades(this);
         this.eventos.cuando_carga.emitir();
     };
     Pilas.prototype.update = function () {
@@ -205,6 +287,7 @@ var Pilas = (function () {
             this.sistemas.procesar_sobre_entidades(this.entidades);
             this.eventos.cuando_actualiza.emitir(this.contador_de_actualizaciones);
         }
+        this.eventos.limpiar();
     };
     Pilas.prototype.pausar = function () {
         this.pausado = true;
@@ -234,6 +317,7 @@ var Sistemas = (function () {
         this.pilas = pilas;
         this.inicializar_sistema(Depurable);
         this.inicializar_sistema(Apariencia);
+        this.inicializar_sistema(SistemaHabilidades);
     }
     Sistemas.prototype.inicializar_sistema = function (clase) {
         try {
@@ -246,8 +330,17 @@ var Sistemas = (function () {
         }
     };
     Sistemas.prototype.procesar_sobre_entidades = function (entidades) {
+        var _this = this;
         this.sistemas.map(function (sistema) {
-            sistema.procesar(entidades);
+            try {
+                sistema.procesar(entidades);
+            }
+            catch (e) {
+                var nombre = sistema.constructor['name'];
+                console.warn("No se puede procesar el sistema '" + nombre + "', se eliminar\u00E1 de la lista de sistemas.");
+                console.error(e);
+                _this.sistemas = _this.sistemas.splice(sistema, 1);
+            }
         });
     };
     return Sistemas;
@@ -323,6 +416,66 @@ var Depurable = (function (_super) {
     };
     return Depurable;
 }(Sistema));
+var SistemaHabilidades = (function (_super) {
+    __extends(SistemaHabilidades, _super);
+    function SistemaHabilidades() {
+        _super.apply(this, arguments);
+    }
+    SistemaHabilidades.prototype.iniciar = function () {
+        var _this = this;
+        this.requisitos = ['habilidades'];
+        this.mapa_de_habilidades = {};
+        this.pilas.eventos.cuando_vincula_habilidad.conectar(function (datos) {
+            _this._cuando_vincula_habilidad(datos);
+        });
+    };
+    SistemaHabilidades.prototype._cuando_vincula_habilidad = function (datos) {
+        this.mapa_de_habilidades[datos.nombre] = datos.objeto;
+    };
+    SistemaHabilidades.prototype.procesar = function (entidades) {
+        var _this = this;
+        var entidades_filtradas = entidades.obtener_entidades_con(this.requisitos);
+        entidades_filtradas.map(function (entidad) {
+            var habilidades_de_la_entidad = entidad.componentes.habilidades.habilidades;
+            var actor = _this.pilas.crear_actor_desde_entidad(entidad.id);
+            habilidades_de_la_entidad.forEach(function (nombre_de_la_habilidad) {
+                var habilidad_del_mapa = _this.mapa_de_habilidades[nombre_de_la_habilidad];
+                habilidad_del_mapa.actor = actor;
+                if (habilidad_del_mapa.actualizar) {
+                    habilidad_del_mapa.actualizar(actor);
+                }
+                _this.pilas.eventos._eventos.map(function (evento) {
+                    _this._procesar_evento_sobre_habilidad(evento, habilidad_del_mapa, actor);
+                });
+            });
+        });
+    };
+    SistemaHabilidades.prototype._procesar_evento_sobre_habilidad = function (evento, habilidad, actor) {
+        var manejador_de_evento = habilidad[evento.tipo];
+        if (manejador_de_evento) {
+            manejador_de_evento.call({ actor: actor }, evento);
+        }
+    };
+    return SistemaHabilidades;
+}(Sistema));
+var Utils = (function () {
+    function Utils(pilas) {
+        this.pilas = pilas;
+    }
+    Utils.prototype.convertir_coordenada_desde_pilas_a_phaser = function (x, y) {
+        return {
+            x: x + this.pilas.game.world.centerX,
+            y0: this.pilas.game.world.centerY - y
+        };
+    };
+    Utils.prototype.convertir_coordenada_desde_phaser_a_pilas = function (x, y) {
+        return {
+            x: x - this.pilas.game.world.centerX,
+            y: this.pilas.game.world.centerY - y
+        };
+    };
+    return Utils;
+}());
 var Validadores = (function () {
     function Validadores(pilas) {
         this.pilas = pilas;

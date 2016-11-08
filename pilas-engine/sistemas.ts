@@ -7,6 +7,7 @@ class Sistemas {
 
     this.inicializar_sistema(Depurable);
     this.inicializar_sistema(Apariencia);
+    this.inicializar_sistema(SistemaHabilidades);
   }
 
   inicializar_sistema(clase) {
@@ -21,7 +22,14 @@ class Sistemas {
 
   procesar_sobre_entidades(entidades: Entidades) {
     this.sistemas.map((sistema) => {
-      sistema.procesar(entidades);
+      try {
+        sistema.procesar(entidades);
+      } catch(e) {
+        let nombre = sistema.constructor['name'];
+        console.warn(`No se puede procesar el sistema '${nombre}', se eliminará de la lista de sistemas.`);
+        console.error(e);
+        this.sistemas = this.sistemas.splice(<any>sistema, 1);
+      }
     });
   }
 

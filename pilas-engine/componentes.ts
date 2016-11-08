@@ -13,6 +13,13 @@ class Componentes {
     return {nombre, datos};
   }
 
-
+  habilidades() {
+    return {
+      nombre: 'habilidades',
+      datos: {
+        habilidades: []
+      }
+    };
+  }
 
 }

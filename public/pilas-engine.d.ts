@@ -12,9 +12,11 @@ declare class Sistema {
 declare class Evento {
     pilas: Pilas;
     evento: Phaser.Signal;
-    constructor(pilas: Pilas);
+    nombre: string;
+    emitir_log: boolean;
+    constructor(pilas: Pilas, nombre: string);
     iniciar(): void;
-    conectar(funcion: any, identificador: any): void;
+    conectar(funcion: any, identificador?: string): void;
     emitir(datos?: {}): void;
 }
 declare class Actores {
@@ -37,6 +39,12 @@ declare class Componentes {
             etiquetas: string[];
         };
     };
+    habilidades(): {
+        nombre: string;
+        datos: {
+            habilidades: any[];
+        };
+    };
 }
 declare class Entidades {
     entidades: Array<any>;
@@ -49,11 +57,30 @@ declare class Entidades {
 }
 declare class Eventos {
     pilas: Pilas;
+    _eventos: Array<any>;
     cuando_agrega_entidad: Evento;
     cuando_actualiza: Evento;
     cuando_carga: Evento;
     cuando_agrega_componente: Evento;
+    cuando_vincula_habilidad: Evento;
+    cuando_hace_click: Evento;
     constructor(pilas: Pilas);
+    private _conectar_eventos();
+    limpiar(): void;
+}
+declare class Habilidades {
+    pilas: Pilas;
+    _habilidades: Array<any>;
+    constructor(pilas: Pilas);
+    vincular(nombre: string, objeto: any): void;
+}
+declare class Log {
+    pilas: Pilas;
+    habilitado: boolean;
+    constructor(pilas: Pilas);
+    info(...args: any[]): void;
+    habilitar(): void;
+    deshabilitar(): void;
 }
 declare class Pilas {
     game: Phaser.Game;
@@ -65,6 +92,9 @@ declare class Pilas {
     componentes: Componentes;
     eventos: Eventos;
     validadores: Validadores;
+    habilidades: Habilidades;
+    log: Log;
+    utils: Utils;
     grupo_actores: Phaser.Group;
     grupo_gui: Phaser.Group;
     constructor(idCanvas: any);
@@ -72,6 +102,7 @@ declare class Pilas {
     obtener_entidades_como_string(): string;
     obtener_cantidad_de_entidades(): number;
     agregar_componente(id: any, componente: any, opciones?: {}): void;
+    agregar_habilidad(id: any, nombre_de_la_habilidad: string): void;
     obtener_entidad_por_id(id: any): any;
     preload(): void;
     private obtener_opciones();
@@ -105,6 +136,25 @@ declare class Depurable extends Sistema {
     procesar(entidades: Entidades): void;
     _dibujar_cruz_del_punto_de_control(canvas: any, x: any, y: any): void;
     _dibujar_cruz(canvas: any, x: any, y: any, l: any): void;
+}
+declare class SistemaHabilidades extends Sistema {
+    mapa_de_habilidades: any;
+    iniciar(): void;
+    private _cuando_vincula_habilidad(datos);
+    procesar(entidades: Entidades): void;
+    _procesar_evento_sobre_habilidad(evento: any, habilidad: any, actor: any): void;
+}
+declare class Utils {
+    pilas: Pilas;
+    constructor(pilas: Pilas);
+    convertir_coordenada_desde_pilas_a_phaser(x: number, y: number): {
+        x: number;
+        y0: number;
+    };
+    convertir_coordenada_desde_phaser_a_pilas(x: number, y: number): {
+        x: number;
+        y: number;
+    };
 }
 declare class Validadores {
     pilas: Pilas;
