@@ -105,6 +105,8 @@ declare class Pilas {
     agregar_habilidad(id: any, nombre_de_la_habilidad: string): void;
     obtener_entidad_por_id(id: any): any;
     preload(): void;
+    obtener_cuadros_por_segundo(): number;
+    definir_cuadros_por_segundo(numero: Number): void;
     private obtener_opciones();
     create(): void;
     update(): void;

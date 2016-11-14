@@ -253,8 +253,13 @@ var Pilas = (function () {
     };
     Pilas.prototype.preload = function () {
         this.game.stage.disableVisibilityChange = true;
-        this.game.time.desiredFps = 1;
         this.game.load.image('ember', 'imagenes/ember.png');
+    };
+    Pilas.prototype.obtener_cuadros_por_segundo = function () {
+        return this.game.time.desiredFps;
+    };
+    Pilas.prototype.definir_cuadros_por_segundo = function (numero) {
+        this.game.time.desiredFps = numero;
     };
     Pilas.prototype.obtener_opciones = function () {
         var _this = this;

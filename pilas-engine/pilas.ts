@@ -91,11 +91,16 @@ class Pilas {
   preload() {
     // Evita que se active la pausa cuando se pierde el foco del navegador.
     this.game.stage.disableVisibilityChange = true;
-
-    this.game.time.desiredFps = 1;
-
     // Precarga imágenes
     this.game.load.image('ember', 'imagenes/ember.png');
+  }
+
+  obtener_cuadros_por_segundo() {
+    return this.game.time.desiredFps;
+  }
+
+  definir_cuadros_por_segundo(numero: Number) {
+    this.game.time.desiredFps = numero;
   }
 
   private obtener_opciones() {

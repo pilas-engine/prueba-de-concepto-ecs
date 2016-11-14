@@ -6,8 +6,14 @@ export default Ember.Component.extend({
   cantidad_de_entidades: null,        // se actualiza en el método cuandoActualiza
   contador_de_actualizaciones: null,  // se actualiza en el método cuandoActualiza
   habilidades: [],
+  fps: 60,
 
   pilas: null,
+
+  onChange: Ember.observer('fps', function() {
+    let pilas = this.get('pilas');
+    pilas.definir_cuadros_por_segundo(parseInt(this.get('fps'), 10));
+  }),
 
   didInsertElement() {
     let idCanvas = "canvas";
@@ -38,8 +44,10 @@ export default Ember.Component.extend({
   cuando_carga() {
     let pilas = this.get('pilas');
 
+    pilas.definir_cuadros_por_segundo(parseInt(this.get('fps'), 10));
+
     let habilidad = {
-      velocidad: 1,
+      velocidad: 0,
 
       actualizar: function() {
         this.actor.x += this.velocidad;
@@ -54,7 +62,7 @@ export default Ember.Component.extend({
 
       actualizar: function() {
         if (this.actor.x  > 300) {
-          this.actor.x = 0;
+          this.actor.x -= 300;
         }
       }
 
